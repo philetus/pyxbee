@@ -50,7 +50,18 @@ class Read_Demon( Thread ):
 
                         # capture bytes up to count
                         else:
-                            if escape_next:
+                            # parse packet from data buffer when full
+                            if len(buff) == count:
+
+                                # verify checksum
+                                if (sum(buff) + ord(c)) & 0xff == 0xff:
+                                    self._parse_packet( buff )
+                                else:
+                                    print "packet failed checksum!"
+                                buff = []
+                                count_state = 0
+                                count = 0
+                            elif escape_next:
                                 escape_next = False
                                 buff.append( ord(c) ^ 0x20 )
                             elif ord(c) == 0x7d:
@@ -58,18 +69,13 @@ class Read_Demon( Thread ):
                             else:
                                 buff.append( ord(c) )
 
-                            # parse packet from data buffer
-                            if len(buff) == count:
-                                self._parse_packet( buff )
-                                buff = []
-                                count_state = 0
-                                count = 0
+                            
 
                 finally:
                     self.port_lock.release()
                     
     def _parse_packet( self, buff ):
-        print "parsing", buff
+        #print "parsing", buff
 
         # identify packet type and place it on buffer
         if buff[0] == 0x80 or buff[0] == 0x81:
