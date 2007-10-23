@@ -31,8 +31,8 @@ class Receive_Packet():
 
     def __repr__( self ):
         string = "<receive_packet "
-        string += "address='%s'>\n\t" % ".".join( str(i) for i in self.address )
-        string += "".join( chr(i) for i in self.data )
-        string += "\n</receive_packet>"
+        string += "address='%s'>" % ".".join( str(i) for i in self.address )
+        string += ":".join( "%x" % i for i in self.data )
+        string += "</receive_packet>"
         return string
         

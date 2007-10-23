@@ -22,3 +22,6 @@ class Transmit_Packet( Write_Packet ):
             self.message = [ int(b) & 0xff for b in message ]
         assert len(self.message) <= 100
         self.buff.extend( self.message )
+
+    def __repr__( self ):
+        return "<" + ":".join( "%x" % b for b in self.buff ) + ">"

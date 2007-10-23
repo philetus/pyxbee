@@ -164,23 +164,40 @@ class Xbee( Thread ):
 
     def _process_data( self, bytes ):
         for b in bytes:
-            #print "b:", b
+            #print "[%x]" % b,
 
             # look for delimiter
-            if self.count_state == 0:
-                if b == 0x7e:
-                    self.count_state = 1
+            if b == 0x7e:
+                if self.count_state != 0:
+                    print "unexpected start of packet!", self.read_buff
+                    self.read_buff = []
+                self.count_state = 1
+                self.count = 0
+
+            # look for escape chars
+            elif b == 0x7d:
+                self.escape_next = True
 
             # get count
             elif self.count_state == 1:
+                if self.escape_next:
+                    b = b ^ 0x20
+                    self.escape_next = False
                 self.count = b * 256
                 self.count_state = 2
             elif self.count_state == 2:
+                if self.escape_next:
+                    b = b ^ 0x20
+                    self.escape_next = False
                 self.count += b
                 self.count_state = 3
 
             # capture bytes up to count
             else:
+                if self.escape_next:
+                    b = b ^ 0x20
+                    self.escape_next = False
+                    
                 # parse packet from data buffer when full
                 if len(self.read_buff) == self.count:
 
@@ -188,15 +205,10 @@ class Xbee( Thread ):
                     if (sum(self.read_buff) + b) & 0xff == 0xff:
                         self._parse_packet( self.read_buff )
                     else:
-                        print "packet failed checksum!"
+                        print "packet failed checksum!", self.read_buff
                     self.read_buff = []
                     self.count_state = 0
                     self.count = 0
-                elif self.escape_next:
-                    self.escape_next = False
-                    self.read_buff.append( b ^ 0x20 )
-                elif b == 0x7d:
-                    self.escape_next = True
                 else:
                     self.read_buff.append( b )
 
@@ -207,7 +219,7 @@ class Xbee( Thread ):
         # place receive packets on read buffer
         if api_id == 0x80 or api_id == 0x81:
             packet = Receive_Packet( buff )
-            self.queue.put( packet )
+            self.read_queue.put( packet )
 
         # place response packets on appopriate queue in response farm
         elif api_id == 0x88 or api_id == 0x89:
