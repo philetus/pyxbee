@@ -39,6 +39,8 @@ class Xbee( Thread ):
         self.count_state = 0 # 0 - need delimiter, 1 - need high, 2 - need low, 3
         self.count = 0
 
+    def is_open( self ):
+        return self.port.isOpen()
 
     def run( self ):
         while self.port:
@@ -157,7 +159,7 @@ class Xbee( Thread ):
         # write packet buffer to serial port
         buff_string = "".join( chr(b) for b in packet.buff )
         print "writing:", buff_string, "...",
-        
+        print buff_string
         self.port.write( buff_string )
         
         print "done writing"
