@@ -23,6 +23,9 @@ class Xbee( Thread ):
         self.port.write( "X" )
         sleep( 0.3 )
 
+        # clear serial port input buffer
+        self.port.flushInput()
+
         self.write_queue = Queue()
         self.read_queue = Queue()
 
