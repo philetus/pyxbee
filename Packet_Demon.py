@@ -96,8 +96,8 @@ class Packet_Demon( Thread ):
     def _reset_packet( self ):
         
         # count is set to true when read buffer reaches count
-        if self.count is not True:
-            print "%d!" % self.name,
+##        if self.count is not True:
+##            print "%d!" % self.name,
 ##            print "%d: packet stream closed on byte %s/%s: '%s'\n" % (
 ##                self.name, len(self.read_buffer), str(self.count),
 ##                ":".join("%x" % ord(c) for c in self.read_buffer) )

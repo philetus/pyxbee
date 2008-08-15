@@ -7,7 +7,7 @@ from Packet_Demon import Packet_Demon
 class Xbee( Thread ):
     """library to control xbee in api mode
     """
-    PACKET_DEMON_COUNT = 10
+    PACKET_DEMON_COUNT = 5
 
     def __init__( self, port="/dev/ttyUSB0", timeout=0.1 ):
         Thread.__init__( self )
